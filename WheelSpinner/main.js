@@ -14,38 +14,36 @@ let objects = []
 
 function drawWheel() {
     ctx.clearRect(0, 0, cnv.width, cnv.height);
-    ctx.fillStyle = "blue";
-    ctx.arc(circleX, circleY, radius, 0, 2 * Math.PI);
-    ctx.fill()
-    
     
     calcDivide()
-    
-    
-    
-    requestAnimationFrame(drawWheel);
 }
 
+let colors = ["blue", "red", "yellow", "brown", "grey", "purple", "pink"]
 
 function calcDivide() {
     let divides = objects.length;
     let angles = 360/divides;
-    let currentAngle = 0;
+    let startAngle = 0
+    let endAngle = angles * Math.PI/180
+
     
-    if (divides > 1) {
-        for (let i=divides; i > 0; i--) {
-            currentAngle = currentAngle + angles;
-            let currentRadian = currentAngle / 180 * Math.PI;
-            let endX = circleX + radius * Math.cos(currentRadian);
-            let endY = circleY - radius * Math.sin(currentRadian);
-    
-            ctx.beginPath();
-            ctx.moveTo(circleX, circleY);
-            ctx.lineTo(endX, endY);
-            ctx.stroke();
-        }
+
+    for (let i=divides; i >= 0; i--) {
+        ctx.beginPath();
+        ctx.moveTo(circleX, circleY);
+        ctx.arc(circleX, circleY, radius, startAngle, endAngle);
+           
+        ctx.fillStyle = colors[i%7];
+        ctx.fill();
+        startAngle = endAngle
+        endAngle = (angles * Math.PI/180) + startAngle
+        console.log(startAngle, endAngle)
+            
     }
+
 }
+
+
 
 function AddThing() {
     let input = addObjectInput.value.trim()
@@ -59,9 +57,9 @@ function AddThing() {
         newObject.appendChild(newText);
         objectList.appendChild(newObject);
     }
+    drawWheel()
 }
 
 addInputButton.addEventListener("click", AddThing)
 
 
-requestAnimationFrame(drawWheel);
