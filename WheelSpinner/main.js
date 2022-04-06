@@ -11,23 +11,17 @@ let addObjectInput = document.getElementById("AddObjectInput")
 let objectList = document.getElementById("ObjectList")
 
 let objects = []
+let colors = ["blue", "red", "yellow", "brown", "grey", "purple", "pink"]
 
 function drawWheel() {
     ctx.clearRect(0, 0, cnv.width, cnv.height);
     
-    calcDivide()
-}
-
-let colors = ["blue", "red", "yellow", "brown", "grey", "purple", "pink"]
-
-function calcDivide() {
     let divides = objects.length;
     let angles = 360/divides;
     let startAngle = 0
     let endAngle = angles * Math.PI/180
 
     
-
     for (let i=divides; i >= 0; i--) {
         ctx.beginPath();
         ctx.moveTo(circleX, circleY);
@@ -39,10 +33,8 @@ function calcDivide() {
         endAngle = (angles * Math.PI/180) + startAngle
         console.log(startAngle, endAngle)
             
-    }
-
+    }   
 }
-
 
 
 function AddThing() {
