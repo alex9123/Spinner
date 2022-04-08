@@ -11,7 +11,7 @@ let addObjectInput = document.getElementById("AddObjectInput")
 let objectList = document.getElementById("ObjectList")
 
 let objects = []
-let colors = ["blue", "red", "yellow", "brown", "grey", "purple", "pink"]
+let colors = ["blue", "red", "green", "brown", "grey", "purple", "orange"]
 
 function drawWheel() {
     ctx.clearRect(0, 0, cnv.width, cnv.height);
@@ -34,22 +34,43 @@ function drawWheel() {
         endAngle = (angles * Math.PI/180) + startAngle
     }   
 
+    // Draw circle in middle
+
+    if (objects.length > 0) {
+        ctx.beginPath();
+        ctx.fillStyle = "black"
+        ctx.arc(circleX, circleY, radius/6, 0, 2 * Math.PI);
+        ctx.fill()
+
+        // Text in circle
+        ctx.font = "15px Arial"
+        ctx.fillStyle = "white"
+        ctx.fillText("Click To Spin", circleX - ctx.measureText("Click To Spin").width/2, circleY);
+    }
+
     // Draw Text (separate loop because overlapping for some reason)
 
     startAngle = 0
     endAngle = angles * Math.PI/180
 
     for (let i=0; i < objects.length; i++) {
-        ctx.fillStyle = "white"
-        ctx.font = "30px Arial";
-        ctx.save()
-        ctx.translate(circleX, circleY)
+        let space = 15 // Space between word and edge of wheel
         let rotateAngle = (startAngle+endAngle)/2
-        console.log(rotateAngle)
-        if (Math.PI/2 <= rotateAngle || rotateAngle >= Math.PI * 1.5) {
-            console.log("go")
+
+        ctx.fillStyle = "white"
+        ctx.font = calcFont(i, space);
+
+        let inputWidth = ctx.measureText(objects[i].text).width // text width
+
+        if (objects.length === 1) { // So first one is not upsidedown
             rotateAngle = 0
         }
+
+        let endX = circleX + (radius - inputWidth - space) * Math.cos(rotateAngle)
+        let endY = circleX + (radius - inputWidth - space)* Math.sin(rotateAngle)
+
+        ctx.save()
+        ctx.translate(endX, endY)
         ctx.rotate(rotateAngle)
         ctx.fillText(String(objects[i].text), 0, 0);
 
@@ -58,6 +79,20 @@ function drawWheel() {
         startAngle = endAngle
         endAngle = (angles * Math.PI/180) + startAngle
     }
+}
+
+function calcFont(currentObject, space) {
+    ctx.font = "30px Arial"
+    let size = 30 // Defult
+    length = ctx.measureText(objects[currentObject].text).width
+    while (length >= radius - radius/6 - space) {
+        size--
+        ctx.font = size + "px Arial"
+        length = ctx.measureText(objects[currentObject].text).width
+    }
+    console.log(size)
+  
+    return (size + 'px') + ' Arial'
 }
 
 
