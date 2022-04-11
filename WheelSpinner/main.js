@@ -58,7 +58,7 @@ function drawWheel() {
         let rotateAngle = (startAngle+endAngle)/2
 
         ctx.fillStyle = "white"
-        ctx.font = calcFont(i, space);
+        ctx.font = calcFont(i, space) + 'px Arial';
 
         let inputWidth = ctx.measureText(objects[i].text).width // text width
 
@@ -72,7 +72,7 @@ function drawWheel() {
         ctx.save()
         ctx.translate(endX, endY)
         ctx.rotate(rotateAngle)
-        ctx.fillText(String(objects[i].text), 0, 0);
+        ctx.fillText(String(objects[i].text), 0, calcFont(i, space)/2);
 
         ctx.restore()
 
@@ -92,8 +92,9 @@ function calcFont(currentObject, space) {
     }
     console.log(size)
   
-    return (size + 'px') + ' Arial'
+    return size
 }
+
 
 
 function AddThing() {
