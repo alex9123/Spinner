@@ -8,10 +8,17 @@ let radius = 300;
 
 let addInputButton = document.getElementById("AddButton")
 let addObjectInput = document.getElementById("AddObjectInput")
+let spinButton = document.getElementById("SpinButton")
 let objectList = document.getElementById("ObjectList")
 
 let objects = []
 let colors = ["blue", "red", "green", "brown", "grey", "purple", "orange"]
+
+let rotateWheelAngle = 0
+let mouseX = 100000; // Get Mouse Positions
+let mouseY = 100000;
+
+let spin = false
 
 function drawWheel() {
     ctx.clearRect(0, 0, cnv.width, cnv.height);
@@ -24,13 +31,15 @@ function drawWheel() {
     // Draw Wheel
     
     for (let i=0; i < objects.length; i++) {
+        ctx.save()
         ctx.beginPath();
         ctx.moveTo(circleX, circleY);
-        ctx.arc(circleX, circleY, radius, startAngle, endAngle);
+        ctx.translate(circleX, circleY)
+        ctx.rotate(rotateWheelAngle * Math.PI/180)
+        ctx.arc(0, 0, radius, startAngle, endAngle);
         ctx.fillStyle = colors[i%7];
         ctx.fill();
-        objects[i].storedStartAngle = startAngle * 180/Math.PI; // convert from radians to degrees
-        objects[i].storedEndAngle = endAngle * 180/Math.PI;
+        ctx.restore()
 
         startAngle = endAngle
         endAngle = (angles * Math.PI/180) + startAngle
@@ -40,14 +49,15 @@ function drawWheel() {
 
     if (objects.length > 0) {
         ctx.beginPath();
-        ctx.fillStyle = "black"
+        ctx.fillStyle = "white"
         ctx.arc(circleX, circleY, radius/6, 0, 2 * Math.PI);
         ctx.fill()
-
-        // Text in circle
-        ctx.font = "15px Arial"
-        ctx.fillStyle = "white"
-        ctx.fillText("Click To Spin", circleX - ctx.measureText("Click To Spin").width/2, circleY);
+        
+        ctx.beginPath()
+        ctx.moveTo(circleX - 10, circleY - radius/6 + 1.5)
+        ctx.lineTo(circleX, circleY - radius/6 - 10)
+        ctx.lineTo(circleX + 10, circleY - radius/6 +1.5)
+        ctx.fill()
     }
 
     // Draw Text (separate loop because overlapping for some reason)
@@ -57,16 +67,12 @@ function drawWheel() {
 
     for (let i=0; i < objects.length; i++) {
         let space = 15 // Space between word and edge of wheel
-        let rotateAngle = (startAngle+endAngle)/2
+        let rotateAngle = ((startAngle+endAngle + 2 * (rotateWheelAngle * Math.PI/180))/2)
 
         ctx.fillStyle = "white"
-        ctx.font = calcFont(i, space) + 'px Arial'
+        ctx.font = calcFont(i, space) + 'px Arial';
 
         let inputWidth = ctx.measureText(objects[i].text).width // text width
-
-        if (objects.length === 1) { // So first one is not upsidedown
-            rotateAngle = 0
-        }
 
         let endX = circleX + (radius - inputWidth - space) * Math.cos(rotateAngle)
         let endY = circleX + (radius - inputWidth - space)* Math.sin(rotateAngle)
@@ -81,6 +87,16 @@ function drawWheel() {
         startAngle = endAngle
         endAngle = (angles * Math.PI/180) + startAngle
     }
+
+    // Spin Wheel
+    
+
+    if (spin) {
+        rotateWheelAngle += 10
+    }
+
+    requestAnimationFrame(drawWheel)
+
 }
 
 function calcFont(currentObject, space) {
@@ -92,19 +108,8 @@ function calcFont(currentObject, space) {
         ctx.font = size + "px Arial"
         length = ctx.measureText(objects[currentObject].text).width
     }
-    console.log(size)
   
     return size
-}
-
-
-function rotateWheel() {
-    ctx.clearRect(0, 0, cnv.width, cnv.height);
-
-    for (let i=0; i < objects.length; i++) {
-        objects[i].storedStartAngle ++
-        objects[i].storedEndAngle ++
-    }
 }
 
 
@@ -113,9 +118,7 @@ function AddThing() {
 
     if (input.length > 0) {
         let thing = {
-            text: addObjectInput.value,
-            storedStartAngle: 0,
-            storedEndAngle: 0
+            text: addObjectInput.value
         }
         objects.push(thing)
 
@@ -126,9 +129,13 @@ function AddThing() {
         newObject.appendChild(newText);
         objectList.appendChild(newObject);
     }
-    drawWheel()
+}
+
+function spinWheel() {
+    spin = true
 }
 
 addInputButton.addEventListener("click", AddThing)
+spinButton.addEventListener("click", spinWheel)
 
-
+requestAnimationFrame(drawWheel)
