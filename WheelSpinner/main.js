@@ -29,6 +29,8 @@ function drawWheel() {
         ctx.arc(circleX, circleY, radius, startAngle, endAngle);
         ctx.fillStyle = colors[i%7];
         ctx.fill();
+        objects[i].storedStartAngle = startAngle * 180/Math.PI; // convert from radians to degrees
+        objects[i].storedEndAngle = endAngle * 180/Math.PI;
 
         startAngle = endAngle
         endAngle = (angles * Math.PI/180) + startAngle
@@ -58,7 +60,7 @@ function drawWheel() {
         let rotateAngle = (startAngle+endAngle)/2
 
         ctx.fillStyle = "white"
-        ctx.font = calcFont(i, space) + 'px Arial';
+        ctx.font = calcFont(i, space) + 'px Arial'
 
         let inputWidth = ctx.measureText(objects[i].text).width // text width
 
@@ -96,13 +98,24 @@ function calcFont(currentObject, space) {
 }
 
 
+function rotateWheel() {
+    ctx.clearRect(0, 0, cnv.width, cnv.height);
+
+    for (let i=0; i < objects.length; i++) {
+        objects[i].storedStartAngle ++
+        objects[i].storedEndAngle ++
+    }
+}
+
 
 function AddThing() {
     let input = addObjectInput.value.trim()
 
     if (input.length > 0) {
         let thing = {
-            text: addObjectInput.value
+            text: addObjectInput.value,
+            storedStartAngle: 0,
+            storedEndAngle: 0
         }
         objects.push(thing)
 
