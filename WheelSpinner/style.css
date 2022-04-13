@@ -57,8 +57,9 @@ canvas {
 
 #SpinButton {
     position: absolute;
-    top: 90%;
-    left: 42.5%;
-    width: 15%;
-    height: 5%;
+    top: 44%;
+    left: 42%;
+    width: 16%;
+    height: 12%;
+    border-radius: 50%;
 }

@@ -8,16 +8,15 @@ let radius = 300;
 
 let addInputButton = document.getElementById("AddButton")
 let addObjectInput = document.getElementById("AddObjectInput")
-let spinButton = document.getElementById("SpinButton")
 let objectList = document.getElementById("ObjectList")
 
 let objects = []
 let colors = ["blue", "red", "green", "brown", "grey", "purple", "orange"]
 
 let rotateWheelAngle = 0
+let speed = 0
 let mouseX = 100000; // Get Mouse Positions
 let mouseY = 100000;
-
 let spin = false
 
 function drawWheel() {
@@ -48,16 +47,21 @@ function drawWheel() {
     // Draw circle in middle
 
     if (objects.length > 0) {
-        ctx.beginPath();
-        ctx.fillStyle = "white"
+        ctx.beginPath();    
+        ctx.fillStyle = "white";
         ctx.arc(circleX, circleY, radius/6, 0, 2 * Math.PI);
-        ctx.fill()
-        
-        ctx.beginPath()
-        ctx.moveTo(circleX - 10, circleY - radius/6 + 1.5)
-        ctx.lineTo(circleX, circleY - radius/6 - 10)
-        ctx.lineTo(circleX + 10, circleY - radius/6 +1.5)
-        ctx.fill()
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(circleX - 10, circleY - radius/6 + 1.5);
+        ctx.lineTo(circleX, circleY - radius/6 - 10);
+        ctx.lineTo(circleX + 10, circleY - radius/6 +1.5);
+        ctx.fill();
+
+       // Text in circle
+       ctx.font = "bold 15px Arial";
+       ctx.fillStyle = "black";
+       ctx.fillText("Click To Spin", circleX - ctx.measureText("Click To Spin").width/2, circleY);
     }
 
     // Draw Text (separate loop because overlapping for some reason)
@@ -90,13 +94,31 @@ function drawWheel() {
 
     // Spin Wheel
     
-
-    if (spin) {
-        rotateWheelAngle += 10
-    }
+   console.log(speed)
+    rotateWheelAngle += speed
 
     requestAnimationFrame(drawWheel)
 
+}
+
+function spinWheel() {
+    spin = true
+    mouseX = 100000;
+    mouseY = 100000;
+    speed = Math.floor(Math.random() * 11) + 20;
+
+    let slowTimer = setInterval(deacceleration, 100)
+
+    function deacceleration() {
+        if (speed > 0) {
+            speed --
+        } else  {
+            clearInterval(slowTimer)
+
+
+            spin = false
+        }
+    }
 }
 
 function calcFont(currentObject, space) {
@@ -131,11 +153,26 @@ function AddThing() {
     }
 }
 
-function spinWheel() {
-    spin = true
+function clickDetector(event) {
+    let cnvRect = cnv.getBoundingClientRect();
+    scaleX = canvas.width / cnvRect.width,    
+    scaleY = canvas.height / cnvRect.height;
+
+    mouseX = (event.x - cnvRect.x) * scaleX;
+    mouseY = (event.y - cnvRect.y) * scaleY;
+
+    let dx = mouseX - circleX;
+    let dy = mouseY - circleY;
+   
+    if (Math.sqrt(dx * dx + dy * dy) <= radius/6) { 
+        if (!spin) {
+            spinWheel()      
+        }
+    }
 }
 
 addInputButton.addEventListener("click", AddThing)
-spinButton.addEventListener("click", spinWheel)
+document.addEventListener("click", clickDetector)
+
 
 requestAnimationFrame(drawWheel)
