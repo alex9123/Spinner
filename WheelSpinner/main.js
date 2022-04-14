@@ -9,6 +9,9 @@ let radius = 300;
 let addInputButton = document.getElementById("AddButton")
 let addObjectInput = document.getElementById("AddObjectInput")
 let objectList = document.getElementById("ObjectList")
+let resultText = document.getElementById("result-text")
+let resultDiv = document.getElementById("result-div")
+let closeResults = document.getElementById("close-results")
 
 let objects = []
 let colors = ["blue", "red", "green", "brown", "grey", "purple", "orange"]
@@ -18,6 +21,8 @@ let speed = 0
 let mouseX = 100000; // Get Mouse Positions
 let mouseY = 100000;
 let spin = false
+
+let selected 
 
 function drawWheel() {
     ctx.clearRect(0, 0, cnv.width, cnv.height);
@@ -36,6 +41,10 @@ function drawWheel() {
         ctx.translate(circleX, circleY)
         ctx.rotate(rotateWheelAngle * Math.PI/180)
         ctx.arc(0, 0, radius, startAngle, endAngle);
+        
+        if (calcRotation(startAngle, endAngle, rotateWheelAngle)) {
+            selected = objects[i].text
+        }
         ctx.fillStyle = colors[i%7];
         ctx.fill();
         ctx.restore()
@@ -94,11 +103,32 @@ function drawWheel() {
 
     // Spin Wheel
     
-   console.log(speed)
     rotateWheelAngle += speed
 
     requestAnimationFrame(drawWheel)
 
+}
+
+function calcRotation(startAngle, endAngle, rotateWheelAngle) {
+    let RealAngle = rotateWheelAngle - ((Math.floor(rotateWheelAngle/360)) * 360)
+    let startBalance = 0
+    let endBalance = 0
+
+    RealAngle *= Math.PI/180
+
+    if (startAngle + RealAngle > 2 * Math.PI) {
+        startBalance = 2 * Math.PI
+    }
+
+    if (endAngle + RealAngle > 2 * Math.PI) {
+        endBalance = 2 * Math.PI
+    }
+    
+    if (startAngle + RealAngle - startBalance <= 1.5 * Math.PI && endAngle + RealAngle - endBalance >= 1.5 * Math.PI) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function spinWheel() {
@@ -115,7 +145,8 @@ function spinWheel() {
         } else  {
             clearInterval(slowTimer)
 
-
+            resultText.innerHTML = selected
+            resultDiv.style.display = "block"
             spin = false
         }
     }
@@ -171,8 +202,12 @@ function clickDetector(event) {
     }
 }
 
+function closeFunction() {
+    resultDiv.style.display = "none"
+}
+
 addInputButton.addEventListener("click", AddThing)
 document.addEventListener("click", clickDetector)
-
+closeResults.addEventListener("click", closeFunction)
 
 requestAnimationFrame(drawWheel)
