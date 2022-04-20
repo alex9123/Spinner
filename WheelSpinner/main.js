@@ -177,9 +177,19 @@ function AddThing() {
 
         let newObject = document.createElement("div");
         let newText = document.createTextNode(addObjectInput.value);
-        newObject.style.border = "1px solid black";
+        let newButton = document.createElement("button");
         newObject.style.margin = "10px";
+        newObject.style.backgroundColor = "white"
+        newObject.style.height = "30px";
+    
+        newButton.style.float = "right"
+        newButton.style.height = "100%"
+        newButton.style.width = "6.5%"
+        newButton.style.background = "url(img/X.png) no-repeat"
+        newButton.style.backgroundSize = "contain"
+
         newObject.appendChild(newText);
+        newObject.appendChild(newButton);
         objectList.appendChild(newObject);
     }
 }
