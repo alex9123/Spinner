@@ -187,6 +187,7 @@ function AddThing() {
         newButton.style.width = "6.5%"
         newButton.style.background = "url(img/X.png) no-repeat"
         newButton.style.backgroundSize = "contain"
+        newButton.classList.add("RemoveButton")
 
         newObject.appendChild(newText);
         newObject.appendChild(newButton);
@@ -205,7 +206,7 @@ function clickDetector(event) {
     let dx = mouseX - circleX;
     let dy = mouseY - circleY;
    
-    if (Math.sqrt(dx * dx + dy * dy) <= radius/6) { 
+    if (Math.sqrt(dx * dx + dy * dy) <= radius/6 && objects.length > 0) { 
         if (!spin) {
             spinWheel()      
         }
@@ -218,6 +219,20 @@ function closeFunction() {
 
 addInputButton.addEventListener("click", AddThing)
 document.addEventListener("click", clickDetector)
-closeResults.addEventListener("click", closeFunction)
+
+closeResults.addEventListener("click", function() {
+    resultDiv.style.display = "none"
+} )
+
+document.addEventListener("click", function(event) {
+    if (!spin) {
+        if (event.target.classList.contains("RemoveButton")) {
+            let parentDiv = event.target.parentNode.parentNode
+            let Div = event.target.parentNode
+            objects.splice(objects.findIndex(item => item.text === Div.innerText), 1)
+            parentDiv.removeChild(Div)
+        }
+    }
+})
 
 requestAnimationFrame(drawWheel)
